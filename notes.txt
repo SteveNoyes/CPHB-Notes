@@ -1,0 +1,39 @@
+A 30-35 minute generation versus your 7-14 usually points to a structural difference, not just a model difference. Likely culprits:
+
+Multi-step or multi-agent pipelines. Many chained LLM calls (plan, generate, review, fix) multiply latency, and errors compound between steps.
+Validation and retry loops. Do they compile or render the template and retry on failure? That can be valuable, but it can also burn most of the runtime.
+Context size. How much of your project's instructions and examples are they sending on every call? Is it the same material each time, or a retrieval step?
+Model choice. Which model(s) are they using, and for which steps? A heavier model on every step is slow and not always better.
+Generation approach. Do they build the whole template at once or section by section? Do they stream output?
+Where the time goes. Ask whether they have per-step timing. If they don't, that's a finding in itself.
+
+Also ask what they use to measure quality, if anything. If they have no evaluation set, that may explain why iterations keep shipping with the same problems.
+
+Bring evidence. Run the same 3-5 inputs through both tools and record the time to generate, the number of edits needed, and the time to a usable final template. That last number is the one that matters. A tool that's slow and also needs heavy cleanup loses twice. Also bring specific failure examples (broken handlebars logic, bad partials, messy CSS) with what correct output looks like. That turns "it's not up to par" into something they can act on.
+
+Be mindful of the IP side. They've used parts of your project, so it's worth clarifying, at least for yourself beforehand, what the arrangement is. Are you a consultant, a collaborator, or just a user giving feedback? Is there any agreement about your prompts and examples? You don't need to make it adversarial, but it's much easier to raise this before they've integrated more of your work. If they're asking to see or use more of what you built, that's a reasonable moment to discuss compensation, credit, or a formal role. Your domain expertise is the hard part to replicate, and it's clearly valuable to them.
+
+Expect to share some of your approach. They'll likely ask how your project works. You can be generous about principles (what makes the instructions effective, how you handle handlebars logic) while deciding in advance what you'd rather not hand over without an agreement.
+
+A possible outcome to steer toward. Rather than only critiquing, propose something concrete: a shared test set of templates with expected outputs, which gives both sides a way to measure progress. You could also offer to review builds against that set. That positions you as a partner with leverage, not just a user with complaints.
+
+One caveat: I'm guessing at the causes of their slowness without seeing their system. Treat the list above as hypotheses to test in the conversation, not conclusions.
+
+If you'd like, I can help you draft a one-page list of your failure examples, or prepare a short comparison table for the timed test runs.
+
+What are ten great questions I should ask?
+
+Here are ten, ordered roughly so the conversation starts friendly and technical, then moves toward the harder topics.
+
+"Can you walk me through what happens from the moment a user submits a request to the moment they get a template?" This gets you the full pipeline in their own words, and the rest of your questions can build on it.
+"Which models are you using, and at which steps?" Heavy models on every step is a common cause of slow, expensive generation.
+"How many separate LLM calls does one template take, and do you have timing for each step?" If they can't tell you where the 30-35 minutes goes, that's the first thing to fix.
+"Do you have any automated checks on the output, such as compiling the Handlebars, rendering the HTML, or running retries? What happens when a check fails?" Retry loops can quietly consume most of the runtime.
+"Which parts of my project did you adopt, and how are they being passed to the model?" Instructions, examples, and structure may have been trimmed, reworded, or split across steps in ways that dilute what made yours work.
+"What does the model see on each call? How large is the prompt, and is it the same context every time or retrieved dynamically?" Bloated or inconsistent context hurts both speed and quality.
+"How do you define and measure a good template? Do you have a test set or evaluation criteria?" Without one, they can't tell whether a new iteration is better or worse than the last.
+"What are the biggest problems you're seeing in the output, and what have you tried so far?" This invites them to name the issues themselves, and it shows you which problems they're already aware of.
+"Where do users spend time after generation, and do you track how much editing is needed before a template is usable?" Time to a finished template is the metric that matters most, not time to first output.
+"How do you see me fitting in going forward? Would a shared test set or ongoing review of builds be useful?" This opens the door to a defined role, and to clarifying credit and compensation, without making the meeting feel like a negotiation.
+
+A few tips for the meeting itself: take notes on their answers to questions 3, 4, and 7 especially, since those tend to reveal the most. If they get defensive on any of them, move on and come back later. And save question 10 for the end, once you've shown that you understand their system.
